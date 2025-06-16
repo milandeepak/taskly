@@ -1,0 +1,106 @@
+{% extends 'base.html'%}
+
+{% block head %}
+<title>Demo</title>
+{% endblock %}
+{% block body %}
+
+
+  <div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+    <div class="flex-none">
+      <a href="/" class="btn btn-ghost normal-case text-xl">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="w-10 h-10 mr-2" />
+        Taskly
+      </a>
+    </div>
+    <div class="flex-1"></div>
+    <div class="flex-none space-x-2">
+      <a href="/login" class="btn btn-outline btn-sm">Login</a>
+      <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
+    </div>
+  </div>
+
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div id="flash-message" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-300 text-gray-800 px-6 py-3 rounded shadow-md font-semibold z-50 flex items-center justify-between w-full max-w-sm transition-opacity duration-300">
+        <span>{{ messages[0] }}</span>
+        <button onclick="dismissFlash()" class="ml-4 text-gray-600 hover:text-black font-bold text-xl leading-none">&times;</button>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="flex min-h-screen">
+    
+
+    <div class="w-48 bg-gray-300 p-4">
+
+      <button class="btn btn-neutral w-full" onclick="document.getElementById('my_modal_1').showModal()">+ Create</button>
+
+      <!-- Create Modal -->
+      <dialog id="my_modal_1" class="modal modal-middle">
+        <form method="POST" action="/demo/add" class="modal-box space-y-4">
+          <h3 class="text-lg font-bold mb-4">New Task</h3>
+          <input type="text" name="title" placeholder="Task title" required class="input input-bordered w-full" />
+          <textarea name="description" placeholder="Task description" class="textarea textarea-bordered w-full"></textarea>
+          <div class="modal-action">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn" onclick="document.getElementById('my_modal_1').close()">Cancel</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+
+    <!-- Tasks -->
+    <div class="flex-1 p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for task in tasks %}
+        <div class="bg-yellow-500 text-white p-4 font-bold flex flex-col justify-between h-48 rounded shadow-md">
+          <div>{{ task.title }}</div>
+          <div>{{ task.description }}</div>
+          <div class="flex justify-end space-x-2 mt-auto">
+            <!-- Delete Button -->
+            <form action="{{ url_for('demo_delete_task', task_id=task.id) }}" method="POST">
+              <button type="submit" class="bg-red-600 p-2 rounded">
+            <img src="{{ url_for('static', filename='images/delete.png') }}" alt="delete" class="h-5 w-5">
+              </button>
+            </form>
+
+            <!-- Edit Button -->
+            <button onclick="document.getElementById('edit_modal_{{ task.id }}').showModal()" class="bg-green-600 p-2 rounded">
+                <img src="{{ url_for('static', filename='images/edit.png') }}" alt="edit" class="h-5 w-5">
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <dialog id="edit_modal_{{ task.id }}" class="modal modal-middle">
+          <form method="POST" action="{{ url_for('demo_edit_task', task_id=task.id) }}" class="modal-box space-y-4">
+            <h3 class="text-lg font-bold mb-4">Edit Task</h3>
+            <input type="text" name="title" value="{{ task.title }}" required class="input input-bordered w-full" />
+            <textarea name="description" class="textarea textarea-bordered w-full">{{ task.description }}</textarea>
+            <div class="modal-action">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn" onclick="document.getElementById('edit_modal_{{ task.id }}').close()">Cancel</button>
+            </div>
+          </form>
+        </dialog>
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <script>
+    function dismissFlash() {
+      const flash = document.getElementById('flash-message');
+      if (flash) {
+        flash.classList.add('opacity-0');
+        setTimeout(() => flash.remove(), 300);
+      }
+    }
+
+    setTimeout(() => {
+      dismissFlash();
+    }, 5000);
+  </script>
+
+{% endblock %}
