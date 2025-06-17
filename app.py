@@ -73,6 +73,7 @@ def home():
                 {'id': str(uuid.uuid4()), 'title': "Edit this one.", 'description': "Click the edit button to modify this task."},
                 {'id': str(uuid.uuid4()), 'title': "Delete a task.", 'description': "Click the delete button to remove this task."},
             ]
+        flash('Welcome to Taskly Demo! Feel free to explore the features. Sign up to save your tasks permanently!')
         return render_template('demo.html', tasks=session['tasks'], logged_in=False)
 
 
